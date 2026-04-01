@@ -39,3 +39,59 @@ async function searchMovies(query) {
     container.innerHTML = "Error";
   }
 }
+
+// Movie-display 
+
+function displayMovies(movies) {
+
+  let container = document.getElementById("movies");
+  container.innerHTML = "";
+
+  movies.forEach(function (movie) {
+
+    let div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <img src="${movie.Poster !== "N/A" ? movie.Poster : ""}">
+      <h3>${movie.Title}</h3>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// dark-white
+
+function toggleMode() {
+  let body = document.body;
+  let toggle = document.querySelector(".toggle");
+
+  body.classList.toggle("light");
+  body.classList.toggle("dark");
+
+  toggle.classList.toggle("active");
+}
+
+
+// background
+
+async function setHeroMovie() {
+
+  let res = await fetch(`https://www.omdbapi.com/?s=batman&apikey=5844ec07`);
+  let data = await res.json();
+
+  let movies = data.Search;
+
+  let randomMovie = movies[Math.floor(Math.random() * movies.length)];
+
+  // poster
+  if (randomMovie.Poster !== "N/A") {
+    document.getElementById("heroPoster").src = randomMovie.Poster;
+  }
+
+  // title
+  document.getElementById("heroTitle").innerText = randomMovie.Title;
+}
+
+setHeroMovie();
