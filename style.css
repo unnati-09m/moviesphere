@@ -80,3 +80,42 @@ nav {
   border: none;
   cursor: pointer;
 }
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 50px;
+  min-height: 70vh;
+  gap: 40px;
+}
+
+/* left-side */
+.hero-left img {
+  width: 300px;
+  border-radius: 10px;
+}
+
+/* ryt-side */
+.hero-right {
+  max-width: 500px;
+}
+
+.hero-right h1 {
+  font-size: 80px;
+}
+
+.hero-buttons button {
+  margin-right: 10px;
+  padding: 10px 15px;
+  background: #e50914;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* overlay */
+.overlay {
+  background: rgba(0,0,0,0.6);
+  padding: 30px;
+  border-radius: 10px;
+}
