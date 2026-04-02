@@ -62,7 +62,7 @@ A simple and clean layout is used, with a separate section for the watchlist so 
 
 * HTML
 * CSS
-* JavaScript (Vanilla JS)
+* JavaScript 
 * Fetch API
 
 ---
