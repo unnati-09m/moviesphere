@@ -97,9 +97,23 @@ nav {
 }
 
 /* left-side */
-.hero-left img {
+/* .hero-left img {
   width: 300px;
   border-radius: 10px;
+} */
+ .hero-left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+/* POSTER */
+.hero-left img {
+  width: 520px;
+  /* border-radius: 5px; */
+  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+  transition: all 0.4s ease;
 }
 
 /* ryt-side */

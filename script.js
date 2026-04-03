@@ -93,5 +93,3 @@ async function setHeroMovie() {
   // title
   document.getElementById("heroTitle").innerText = randomMovie.Title;
 }
-
-setHeroMovie();
