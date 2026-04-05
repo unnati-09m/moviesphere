@@ -185,3 +185,63 @@ body.light .nav-links a {
 body.light #searchIcon {
   color: black;
 }
+
+.category {
+  padding: 20px 60px;
+}
+
+.category h2 {
+  margin-bottom: 15px;
+}
+
+/* HORIZONTAL SCROLL */
+.row {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+}
+
+/* REMOVE SCROLLBAR (optional) */
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+/* CARD */
+.row .card {
+  min-width: 150px;
+  background: #141414;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.row .card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.row .card:hover {
+  transform: scale(1.1);
+}
+
+.card button {
+  margin: 5px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* WATCHLIST */
+.watch-btn {
+  background: #e50914;
+  color: white;
+}
+
+/* LIKE */
+.like-btn {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+}

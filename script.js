@@ -1,95 +1,177 @@
-let icon = document.getElementById("searchIcon");
-let input = document.getElementById("navSearch");
+// 1. Get all the elements from the HTML
+var icon = document.getElementById("searchIcon");
+var input = document.getElementById("navSearch");
+var searchBtn = document.getElementById("searchBtn");
 
-icon.addEventListener("click", function () {
-  input.style.display = "block";
-  input.focus();
-});
+// 2. Search Bar Toggle (Show input when icon is clicked)
+if (icon && input && searchBtn) {
+  icon.onclick = function () {
+    input.style.display = "block";
+    input.focus();
+  };
 
-input.addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    searchMovies(input.value);
+  // Search when Enter key is pressed
+  input.onkeypress = function (e) {
+    if (e.key === "Enter") {
+      goToSearchPage();
+    }
+  };
+
+  // Search when Button is clicked
+  searchBtn.onclick = function () {
+    goToSearchPage();
+  };
+}
+
+// 3. Function to redirect to the search results page
+function goToSearchPage() {
+  var query = input.value;
+
+  if (query === "") {
+    alert("Please enter a movie name");
+    return;
   }
-});
-let searchBtn = document.getElementById("searchBtn");
 
-searchBtn.addEventListener("click", function () {
-  searchMovies(input.value);
-});
+  // Use a simple URL string
+  window.location.href = "search.html?q=" + query;
+}
 
-// movie api fetch
+// 4. Main Function to Fetch Movies from API
 async function searchMovies(query) {
-
-  let container = document.getElementById("movies");
+  var container = document.getElementById("movies");
+  if (!container) return;
 
   container.innerHTML = "Loading...";
 
   try {
-    let res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
-    let data = await res.json();
+    var response = await fetch("https://www.omdbapi.com/?s=" + query + "&apikey=5844ec07");
+    var data = await response.json();
 
     if (data.Response === "False") {
       container.innerHTML = "No movies found";
       return;
     }
 
-    displayMovies(data.Search);
+    displayMovies(data.Search, "movies");
 
-  } catch {
-    container.innerHTML = "Error";
+  } catch (error) {
+    container.innerHTML = "Error loading data";
   }
 }
 
-// Movie-display 
-
-function displayMovies(movies) {
-
-  let container = document.getElementById("movies");
-  container.innerHTML = "";
+// 5. Function to Display Movies in the HTML
+function displayMovies(movies, containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  
+  container.innerHTML = ""; // Clear old content
 
   movies.forEach(function (movie) {
-
-    let div = document.createElement("div");
+    var div = document.createElement("div");
     div.className = "card";
 
+    // Fix: If there is no poster, use a placeholder image from the web
+// If the poster is N/A, we use a generic image from another source
+    var moviePoster = movie.Poster;
+    if (moviePoster === "N/A") {
+      moviePoster = "https://www.prokerala.com/movies/assets/img/no-poster-available.jpg";
+    }
+
+    // Create the HTML for the card
     div.innerHTML = `
-      <img src="${movie.Poster !== "N/A" ? movie.Poster : ""}">
+      <img src="${moviePoster}">
       <h3>${movie.Title}</h3>
+      <button class="watch-btn">+ Watchlist</button>
+      <button class="like-btn">♥</button>
     `;
+
+    // Add click event to the watchlist button
+    var btn = div.querySelector(".watch-btn");
+    btn.onclick = function() {
+      addToWatchlist(movie);
+    };
 
     container.appendChild(div);
   });
 }
 
-// dark-white
+// 6. Category Loading Functions
+async function loadCategory(query, containerId) {
+  var res = await fetch("https://www.omdbapi.com/?s=" + query + "&apikey=5844ec07");
+  var data = await res.json();
 
+  if (data.Response === "True") {
+    displayMovies(data.Search, containerId);
+  }
+}
+
+// 7. Hero Section (Random Batman Movie)
+async function setHeroMovie() {
+  var res = await fetch("https://www.omdbapi.com/?s=batman&apikey=5844ec07");
+  var data = await res.json();
+  var movies = data.Search;
+
+  var randomMovie = movies[Math.floor(Math.random() * movies.length)];
+
+  var heroImg = document.getElementById("heroPoster");
+  var heroTitle = document.getElementById("heroTitle");
+
+  if (heroImg && randomMovie.Poster !== "N/A") {
+    heroImg.src = randomMovie.Poster;
+  }
+  if (heroTitle) {
+    heroTitle.innerText = randomMovie.Title;
+  }
+}
+
+// 8. Watchlist Logic (LocalStorage)
+function addToWatchlist(movie) {
+  var watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+  // Check if already exists to avoid duplicates
+  var exists = false;
+  for (var i = 0; i < watchlist.length; i++) {
+    if (watchlist[i].imdbID === movie.imdbID) {
+      exists = true;
+      break;
+    }
+  }
+
+  if (exists) {
+    alert("Movie is already in your watchlist!");
+  } else {
+    watchlist.push(movie);
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+    alert(movie.Title + " added to watchlist!");
+  }
+}
+
+// 9. Light/Dark Mode Toggle
 function toggleMode() {
-  let body = document.body;
-  let toggle = document.querySelector(".toggle");
+  var body = document.body;
+  var toggle = document.querySelector(".toggle");
 
   body.classList.toggle("light");
   body.classList.toggle("dark");
 
-  toggle.classList.toggle("active");
+  if (toggle) {
+    toggle.classList.toggle("active");
+  }
 }
 
+// 10. Run everything when page loads
+var params = new URLSearchParams(window.location.search);
+var queryValue = params.get("q");
 
-// background
+if (queryValue) {
+  searchMovies(queryValue);
+}
 
-async function setHeroMovie() {
-
-  let res = await fetch(`https://www.omdbapi.com/?s=batman&apikey=5844ec07`);
-  let data = await res.json();
-
-  let movies = data.Search;
-
-  let randomMovie = movies[Math.floor(Math.random() * movies.length)];
-
-  // poster
-  if (randomMovie.Poster !== "N/A") {
-    document.getElementById("heroPoster").src = randomMovie.Poster;
-  }
-
-  // title
-  document.getElementById("heroTitle").innerText = randomMovie.Title;
+// Only run these on the homepage where these IDs exist
+if (document.getElementById("heroTitle")) {
+  setHeroMovie();
+  loadCategory("comedy", "comedy");
+  loadCategory("romance", "romance");
+  loadCategory("sci-fi", "scifi");
+  loadCategory("action", "action");
 }
