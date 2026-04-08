@@ -218,3 +218,11 @@ body.light .card { background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 body.light .card-info { background: #fff; }
 body.light .card-info h3 { color: #333; }
 body.light .actions button { border-color: #ccc; color: #333; }
+
+#sortSelect {
+  margin: 20px 60px;
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 8px;
+}
