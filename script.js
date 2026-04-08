@@ -52,7 +52,14 @@ async function searchMovies(query) {
       return;
     }
 
-    displayMovies(data.Search, "movies");
+    var movies = data.Search;
+
+
+    var filteredMovies = movies.filter(function(movie) {
+      return movie.Title.toLowerCase().includes(query.toLowerCase());
+    });
+
+displayMovies(filteredMovies, "movies");
 
   } catch (error) {
     container.innerHTML = "Error loading data";
