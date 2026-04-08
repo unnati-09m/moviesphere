@@ -1,6 +1,8 @@
+/* --- GLOBAL STYLES --- */
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  transition: background 0.3s ease;
 }
 
 body.dark {
@@ -13,30 +15,27 @@ body.light {
   color: black;
 }
 
-/* Navbar */
+/* --- NAVBAR --- */
 nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 30px;
+  padding: 10px 40px;
   background: #111;
-  
+  color: white;
 }
 
 .logo {
-  color: #375e37;
+  color: #e50914; /* Netflix Red */
+  font-size: 24px;
+  font-weight: bold;
 }
-.nav-links {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-  padding: 10px;
-}
+
 .nav-links a {
-  margin: 0 10px;
+  margin: 0 15px;
   color: white;
   text-decoration: none;
-  
+  font-size: 14px;
 }
 
 .nav-actions {
@@ -45,203 +44,177 @@ nav {
   gap: 15px;
 }
 
+#navSearch {
+  display: none; /* Toggled by JS */
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #222;
+  color: white;
+}
 
-#searchIcon {
+#searchBtn {
+  padding: 5px 15px;
+  background: #e50914;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-
-#navSearch {
-  display: none;
-  padding: 5px;
-}
-/* Toggle */
+/* --- TOGGLE SWITCH --- */
 .toggle {
   width: 50px;
-  height: 25px;
-  background: gray;
+  height: 24px;
+  background: #444;
   border-radius: 20px;
   position: relative;
   cursor: pointer;
 }
 
 .circle {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background: white;
   border-radius: 50%;
   position: absolute;
-  top: 2.5px;
+  top: 3px;
   left: 3px;
   transition: 0.3s;
 }
 
-.toggle.active .circle {
-  left: 25px;
-}
+.toggle.active { background: #e50914; }
+.toggle.active .circle { left: 28px; }
 
-#searchBtn {
-  padding: 5px 10px;
-  background: #e50914;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
+/* --- HERO SECTION --- */
 .hero {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 50px;
+  padding: 60px;
   min-height: 70vh;
-  gap: 40px;
+  gap: 50px;
 }
 
-/* left-side */
-/* .hero-left img {
-  width: 300px;
-  border-radius: 10px;
-} */
- .hero-left {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-}
-
-/* POSTER */
 .hero-left img {
-  width: 520px;
-  /* border-radius: 5px; */
-  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-  transition: all 0.4s ease;
+  width: 450px;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
 
-/* ryt-side */
-.hero-right {
-  max-width: 500px;
-}
-
-.hero-right h1 {
-  font-size: 80px;
-}
+.hero-right h1 { font-size: 64px; margin-bottom: 10px; }
 
 .hero-buttons button {
   margin-right: 10px;
-  padding: 10px 15px;
-  background: #e50914;
-  color: white;
+  padding: 12px 25px;
+  font-weight: bold;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-/* overlay */
-.overlay {
-  background: rgba(0,0,0,0.6);
-  padding: 30px;
-  border-radius: 10px;
-}
+.hero-buttons button:first-child { background: white; color: black; }
+.hero-buttons button:last-child { background: rgba(109, 109, 110, 0.7); color: white; }
 
-.movies-section {
-  padding: 20px;
-}
-
-#movies {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-}
-
-/* result card */
-.card {
-  background: #141414;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-.card img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-}
-
-.card h3 {
-  padding: 10px;
-}
-
-/* light mode  */
-body.light nav {
-  background: #eee;
-}
-
-body.light .nav-links a {
-  color: black;
-}
-
-body.light #searchIcon {
-  color: black;
-}
-
+/* --- MOVIE GRID & ROWS --- */
 .category {
   padding: 20px 60px;
 }
 
-.category h2 {
-  margin-bottom: 15px;
-}
-
-/* HORIZONTAL SCROLL */
 .row {
   display: flex;
-  overflow-x: auto;
   gap: 15px;
+  overflow-x: auto;
+  padding: 20px 0;
+  min-height: 320px; /* Fixed: Prevents blank space issues */
+  align-items: flex-start;
 }
 
-/* REMOVE SCROLLBAR (optional) */
-.row::-webkit-scrollbar {
-  display: none;
-}
+.row::-webkit-scrollbar { display: none; }
 
-/* CARD */
-.row .card {
-  min-width: 150px;
-  background: #141414;
-  border-radius: 10px;
+/* --- MOVIE CARD (The "Netflix" Hover Look by Default) --- */
+.card {
+  min-width: 200px;
+  background: #181818;
+  border-radius: 6px;
   overflow: hidden;
-  transition: 0.3s;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
-.row .card img {
+.card:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.card img {
   width: 100%;
-  height: 220px;
+  height: 130px; /* Wide aspect ratio like Netflix */
   object-fit: cover;
 }
 
-.row .card:hover {
-  transform: scale(1.1);
+.card-info {
+  padding: 12px;
+  background: #181818;
 }
 
-.card button {
-  margin: 5px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* WATCHLIST */
-.watch-btn {
-  background: #e50914;
+.card-info h3 {
+  font-size: 14px;
+  margin: 0 0 8px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: white;
 }
 
-/* LIKE */
-.like-btn {
+.card-info p {
+  font-size: 12px;
+  color: #a3a3a3;
+  margin: 4px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.actions button {
   background: transparent;
-  border: 1px solid white;
+  border: 1px solid #555;
   color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.2s;
 }
+
+.actions button:hover {
+  border-color: white;
+  background: rgba(255,255,255,0.1);
+}
+
+.actions .watch-btn { background: #e50914; border: none; border-radius: 4px; width: auto; padding: 0 10px; font-weight: bold; }
+
+/* --- SEARCH PAGE RESULTS --- */
+#movies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 30px;
+  padding: 40px 60px;
+}
+
+/* --- LIGHT MODE OVERRIDES --- */
+body.light nav { background: #ffffff; border-bottom: 1px solid #ddd; }
+body.light .logo { color: #e50914; }
+body.light .nav-links a, body.light #searchIcon { color: #333; }
+body.light #navSearch { background: #fff; color: #333; border-color: #ccc; }
+body.light .card { background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+body.light .card-info { background: #fff; }
+body.light .card-info h3 { color: #333; }
+body.light .actions button { border-color: #ccc; color: #333; }
