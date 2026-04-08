@@ -57,7 +57,7 @@ if (sortSelect) {
       displayMovies(sortedData, "movies");
     } 
     
-    // Also apply to Home Page Categories if they exist
+    //   Home Page Categories if they exist
     const categories = [
       { query: "comedy", id: "comedy" },
       { query: "romance", id: "romance" },
@@ -177,3 +177,38 @@ window.onload = () => {
     loadCategory("action", "action");
   }
 };
+// --- WATCHLIST PAGE LOGIC ---
+function displayWatchlist() {
+    const container = document.getElementById("watchlistContainer");
+    if (!container) return;
+
+    const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+    container.innerHTML = "";
+
+    if (watchlist.length === 0) {
+        container.innerHTML = "<h3>Your watchlist is empty. Start adding some movies!</h3>";
+        return;
+    }
+
+    // Reuse your existing display logic but add a Remove button
+    watchlist.forEach(movie => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+            <img src="${movie.Poster}">
+            <div class="card-info">
+                <h3>${movie.Title}</h3>
+                <button class="remove-btn" onclick="removeFromWatchlist('${movie.imdbID}')">Remove</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function removeFromWatchlist(id) {
+    let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+    // ✅ HOF: Using .filter() to remove the item
+    watchlist = watchlist.filter(m => m.imdbID !== id);
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+    displayWatchlist(); // Refresh the page
+}
