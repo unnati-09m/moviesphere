@@ -1,8 +1,8 @@
+// --- NAVBAR & SEARCH LOGIC ---
 var icon = document.getElementById("searchIcon");
 var input = document.getElementById("navSearch");
 var searchBtn = document.getElementById("searchBtn");
 
-// --- NAVBAR LOGIC ---
 if (icon && input && searchBtn) {
   icon.onclick = () => { input.style.display = "block"; input.focus(); };
   input.onkeypress = (e) => { if (e.key === "Enter") goToSearchPage(); };
@@ -15,10 +15,40 @@ function goToSearchPage() {
   window.location.href = "search.html?q=" + query;
 }
 
-// --- STATE MANAGEMENT ---
+// --- STATE & HERO SECTION ---
 let currentSearchResults = []; 
 
-// --- SEARCH LOGIC ---
+async function setHeroMovie() {
+  // Array of keywords to get a random vibe each time
+  const topics = ["Avengers", "Batman", "Interstellar", "Star Wars", "Inception", "Joker"];
+  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+
+  try {
+    const res = await fetch(`https://www.omdbapi.com/?s=${randomTopic}&apikey=5844ec07`);
+    const data = await res.json();
+
+    if (data.Response === "True") {
+      const randomMovie = data.Search[Math.floor(Math.random() * data.Search.length)];
+      
+      // Update UI Elements
+      const heroPoster = document.getElementById("heroPoster");
+      const heroTitle = document.getElementById("heroTitle");
+      const heroText = document.getElementById("heroText");
+
+      if (heroPoster) heroPoster.src = randomMovie.Poster;
+      if (heroTitle) heroTitle.innerText = randomMovie.Title;
+
+      // SECOND FETCH: Get movie details (Plot/Description)
+      const detailRes = await fetch(`https://www.omdbapi.com/?i=${randomMovie.imdbID}&apikey=5844ec07`);
+      const details = await detailRes.json();
+      if (heroText) heroText.innerText = details.Plot;
+    }
+  } catch (err) {
+    console.log("Hero Error:", err);
+  }
+}
+
+// --- CORE LOGIC: SEARCH & CATEGORIES ---
 async function searchMovies(query) {
   var container = document.getElementById("movies");
   if (!container) return;
@@ -29,7 +59,7 @@ async function searchMovies(query) {
     var data = await response.json();
 
     if (data.Response === "True") {
-      // ✅ HOF: .filter() and .map()
+      // ✅ HOF: .filter() and .map() - REQ FOR MILESTONE
       currentSearchResults = data.Search
         .filter(movie => movie.Poster !== "N/A")
         .map(movie => ({ ...movie, Title: movie.Title.trim() }));
@@ -43,55 +73,15 @@ async function searchMovies(query) {
   }
 }
 
-// --- UNIVERSAL SORTING LOGIC ---
-const sortSelect = document.getElementById("sortSelect");
-
-if (sortSelect) {
-  sortSelect.onchange = async (e) => {
-    const criteria = e.target.value;
-    
-    // Check if we are on the Search Page (if search results exist)
-    if (currentSearchResults.length > 0) {
-      let sortedData = [...currentSearchResults];
-      applySort(sortedData, criteria);
-      displayMovies(sortedData, "movies");
-    } 
-    
-    //   Home Page Categories if they exist
-    const categories = [
-      { query: "comedy", id: "comedy" },
-      { query: "romance", id: "romance" },
-      { query: "sci-fi", id: "scifi" },
-      { query: "action", id: "action" }
-    ];
-
-    categories.forEach(async (cat) => {
-      const container = document.getElementById(cat.id);
-      if (!container) return; // Skip if not on home page
-
-      var res = await fetch(`https://www.omdbapi.com/?s=${cat.query}&apikey=5844ec07`);
-      var data = await res.json();
-      if (data.Response === "True") {
-        let movies = data.Search;
-        applySort(movies, criteria);
-        displayMovies(movies, cat.id);
-      }
-    });
-  };
-}
-
-// Helper function to handle the HOF .sort() logic
-function applySort(array, criteria) {
-  if (criteria === "year-desc") {
-    array.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
-  } else if (criteria === "year-asc") {
-    array.sort((a, b) => parseInt(a.Year) - parseInt(b.Year));
-  } else if (criteria === "alpha") {
-    array.sort((a, b) => a.Title.localeCompare(b.Title));
+async function loadCategory(query, containerId) {
+  var res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
+  var data = await res.json();
+  if (data.Response === "True") {
+    displayMovies(data.Search, containerId);
   }
 }
 
-// --- DISPLAY LOGIC ---
+// --- DISPLAY & SORTING ---
 function displayMovies(movies, containerId) {
   var container = document.getElementById(containerId);
   if (!container) return;
@@ -108,42 +98,58 @@ function displayMovies(movies, containerId) {
         <h3>${movie.Title}</h3>
         <p>${movie.Year}</p>
         <div class="actions">
-          <button class="watch-btn">+ Watchlist</button>
-          <button class="like-btn">♥</button>
+          <button class="watch-btn" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>+ Watchlist</button>
+          <button class="like-btn" onclick="this.style.color='#e50914'">♥</button>
         </div>
       </div>
     `;
-
-    div.querySelector(".watch-btn").onclick = () => addToWatchlist(movie);
-    div.querySelector(".like-btn").onclick = (e) => {
-      e.target.style.color = "#e50914"; 
-    };
-    
     container.appendChild(div);
   });
 }
 
-// --- CATEGORY LOADING ---
-async function loadCategory(query, containerId) {
-  var res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
-  var data = await res.json();
-  if (data.Response === "True") {
-    displayMovies(data.Search, containerId);
-  }
+// --- SORTING LOGIC ---
+const sortSelect = document.getElementById("sortSelect");
+
+if (sortSelect) {
+  sortSelect.onchange = async (e) => {
+    const criteria = e.target.value;
+    
+    // 1. Sort Search Results (if they exist)
+    if (currentSearchResults.length > 0) {
+      applySort(currentSearchResults, criteria);
+      displayMovies(currentSearchResults, "movies");
+    }
+
+    // 2. Sort Home Categories (Comedy, Romance, etc.)
+    const categories = [
+      { query: "comedy", id: "comedy" },
+      { query: "romance", id: "romance" },
+      { query: "sci-fi", id: "scifi" },
+      { query: "action", id: "action" }
+    ];
+
+    categories.forEach(async (cat) => {
+      const container = document.getElementById(cat.id);
+      if (!container) return; // Only runs if on Home Page
+
+      var res = await fetch(`https://www.omdbapi.com/?s=${cat.query}&apikey=5844ec07`);
+      var data = await res.json();
+      if (data.Response === "True") {
+        let movies = data.Search;
+        applySort(movies, criteria); // ✅ Apply HOF .sort()
+        displayMovies(movies, cat.id);
+      }
+    });
+  };
 }
 
-async function setHeroMovie() {
-  var res = await fetch("https://www.omdbapi.com/?s=batman&apikey=5844ec07");
-  var data = await res.json();
-  if (data.Response === "True") {
-    var randomMovie = data.Search[Math.floor(Math.random() * data.Search.length)];
-    var heroPoster = document.getElementById("heroPoster");
-    var heroTitle = document.getElementById("heroTitle");
-    if(heroPoster) heroPoster.src = randomMovie.Poster;
-    if(heroTitle) heroTitle.innerText = randomMovie.Title;
-  }
+// Helper for sorting
+function applySort(array, criteria) {
+  if (criteria === "year-desc") array.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
+  else if (criteria === "year-asc") array.sort((a, b) => parseInt(a.Year) - parseInt(b.Year));
+  else if (criteria === "alpha") array.sort((a, b) => a.Title.localeCompare(b.Title));
 }
-
+// --- WATCHLIST LOGIC ---
 function addToWatchlist(movie) {
   var watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
   if (watchlist.some(m => m.imdbID === movie.imdbID)) {
@@ -151,46 +157,16 @@ function addToWatchlist(movie) {
   } else {
     watchlist.push(movie);
     localStorage.setItem("watchlist", JSON.stringify(watchlist));
-    alert("Added!");
+    alert("Added to Watchlist!");
   }
 }
 
-function toggleMode() {
-  var body = document.body;
-  var toggle = document.querySelector(".toggle");
-  body.classList.toggle("dark");
-  body.classList.toggle("light");
-  if(toggle) toggle.classList.toggle("active");
-}
-
-// --- INITIALIZE ---
-window.onload = () => {
-  var params = new URLSearchParams(window.location.search);
-  var queryValue = params.get("q");
-  if (queryValue) searchMovies(queryValue);
-
-  if (document.getElementById("heroTitle")) {
-    setHeroMovie();
-    loadCategory("comedy", "comedy");
-    loadCategory("romance", "romance");
-    loadCategory("sci-fi", "scifi");
-    loadCategory("action", "action");
-  }
-};
-// --- WATCHLIST PAGE LOGIC ---
 function displayWatchlist() {
     const container = document.getElementById("watchlistContainer");
     if (!container) return;
-
     const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-    container.innerHTML = "";
+    container.innerHTML = watchlist.length ? "" : "<h3>Your watchlist is empty.</h3>";
 
-    if (watchlist.length === 0) {
-        container.innerHTML = "<h3>Your watchlist is empty. Start adding some movies!</h3>";
-        return;
-    }
-
-    // Reuse your existing display logic but add a Remove button
     watchlist.forEach(movie => {
         const div = document.createElement("div");
         div.className = "card";
@@ -206,9 +182,30 @@ function displayWatchlist() {
 }
 
 function removeFromWatchlist(id) {
-    let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
-    // ✅ HOF: Using .filter() to remove the item
-    watchlist = watchlist.filter(m => m.imdbID !== id);
-    localStorage.setItem("watchlist", JSON.stringify(watchlist));
-    displayWatchlist(); // Refresh the page
+    let list = JSON.parse(localStorage.getItem("watchlist")) || [];
+    list = list.filter(m => m.imdbID !== id); // ✅ HOF: .filter()
+    localStorage.setItem("watchlist", JSON.stringify(list));
+    displayWatchlist();
 }
+
+// --- THEME & INIT ---
+function toggleMode() {
+  document.body.classList.toggle("dark");
+  document.body.classList.toggle("light");
+  document.querySelector(".toggle").classList.toggle("active");
+}
+
+window.onload = () => {
+  var params = new URLSearchParams(window.location.search);
+  var q = params.get("q");
+  if (q) searchMovies(q);
+
+  if (document.getElementById("heroTitle")) {
+    setHeroMovie();
+    loadCategory("comedy", "comedy");
+    loadCategory("romance", "romance");
+    loadCategory("sci-fi", "scifi");
+    loadCategory("action", "action");
+  }
+  displayWatchlist();
+};
