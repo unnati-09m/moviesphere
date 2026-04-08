@@ -63,6 +63,16 @@
 <!-- Movies -->
  <section class="movies-section">
    <h2></h2>
+   <div style="padding: 0 60px;">
+  <label for="sortSelect">Sort By: </label>
+  <select id="sortSelect" style="padding: 5px; border-radius: 4px;">
+    <option value="default">Default</option>
+    <option value="year-desc">Newest First</option>
+    <option value="year-asc">Oldest First</option>
+    <option value="alpha">Alphabetical (A-Z)</option>
+  </select>
+</div>
+
    <div id="movies"></div>
  </section>
 <section class="category">
