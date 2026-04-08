@@ -2,6 +2,7 @@ var icon = document.getElementById("searchIcon");
 var input = document.getElementById("navSearch");
 var searchBtn = document.getElementById("searchBtn");
 
+// --- NAVBAR LOGIC ---
 if (icon && input && searchBtn) {
   icon.onclick = () => { input.style.display = "block"; input.focus(); };
   input.onkeypress = (e) => { if (e.key === "Enter") goToSearchPage(); };
@@ -14,28 +15,26 @@ function goToSearchPage() {
   window.location.href = "search.html?q=" + query;
 }
 
+// --- STATE MANAGEMENT ---
+let currentSearchResults = []; 
+
+// --- SEARCH LOGIC ---
 async function searchMovies(query) {
   var container = document.getElementById("movies");
   if (!container) return;
   container.innerHTML = "Loading...";
-  
+
   try {
     var response = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
     var data = await response.json();
-    
-    if (data.Response === "True") {
-      // ✅ Milestone Requirement: .filter() 
-      // Filtering out any results that aren't 'movie' type
-      const moviesOnly = data.Search.filter(item => item.Type === "movie");
-      
-      // ✅ Milestone Requirement: .map() 
-      // Let's clean up titles using map just to demonstrate the HOF skill
-      const cleanedMovies = moviesOnly.map(m => ({
-        ...m,
-        Title: m.Title.trim()
-      }));
 
-      displayMovies(cleanedMovies, "movies");
+    if (data.Response === "True") {
+      // ✅ HOF: .filter() and .map()
+      currentSearchResults = data.Search
+        .filter(movie => movie.Poster !== "N/A")
+        .map(movie => ({ ...movie, Title: movie.Title.trim() }));
+
+      displayMovies(currentSearchResults, "movies");
     } else {
       container.innerHTML = "No movies found";
     }
@@ -44,6 +43,55 @@ async function searchMovies(query) {
   }
 }
 
+// --- UNIVERSAL SORTING LOGIC ---
+const sortSelect = document.getElementById("sortSelect");
+
+if (sortSelect) {
+  sortSelect.onchange = async (e) => {
+    const criteria = e.target.value;
+    
+    // Check if we are on the Search Page (if search results exist)
+    if (currentSearchResults.length > 0) {
+      let sortedData = [...currentSearchResults];
+      applySort(sortedData, criteria);
+      displayMovies(sortedData, "movies");
+    } 
+    
+    // Also apply to Home Page Categories if they exist
+    const categories = [
+      { query: "comedy", id: "comedy" },
+      { query: "romance", id: "romance" },
+      { query: "sci-fi", id: "scifi" },
+      { query: "action", id: "action" }
+    ];
+
+    categories.forEach(async (cat) => {
+      const container = document.getElementById(cat.id);
+      if (!container) return; // Skip if not on home page
+
+      var res = await fetch(`https://www.omdbapi.com/?s=${cat.query}&apikey=5844ec07`);
+      var data = await res.json();
+      if (data.Response === "True") {
+        let movies = data.Search;
+        applySort(movies, criteria);
+        displayMovies(movies, cat.id);
+      }
+    });
+  };
+}
+
+// Helper function to handle the HOF .sort() logic
+function applySort(array, criteria) {
+  if (criteria === "year-desc") {
+    array.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
+  } else if (criteria === "year-asc") {
+    array.sort((a, b) => parseInt(a.Year) - parseInt(b.Year));
+  } else if (criteria === "alpha") {
+    array.sort((a, b) => a.Title.localeCompare(b.Title));
+  }
+}
+
+// --- DISPLAY LOGIC ---
 function displayMovies(movies, containerId) {
   var container = document.getElementById(containerId);
   if (!container) return;
@@ -52,40 +100,35 @@ function displayMovies(movies, containerId) {
   movies.forEach(function (movie) {
     var div = document.createElement("div");
     div.className = "card";
-    // Inside the forEach loop where you create the card:
-    const viewBtn = document.createElement("button");
-    viewBtn.innerText = "View Info";
-    viewBtn.onclick = () => alert(`Movie: ${movie.Title}\nYear: ${movie.Year}\nID: ${movie.imdbID}`);
-    // Append this to your card actions
-    var moviePoster = movie.Poster === "N/A" ? "https://www.prokerala.com/movies/assets/img/no-poster-available.jpg" : movie.Poster;
+    var poster = movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/200x300?text=No+Poster";
     
-    // Enhanced UI: Added card-info to show metadata by default
     div.innerHTML = `
-      <img src="${moviePoster}">
+      <img src="${poster}">
       <div class="card-info">
         <h3>${movie.Title}</h3>
-        <p><span style="color:#46d369">98% Match</span> ${movie.Year}</p>
+        <p>${movie.Year}</p>
         <div class="actions">
-          <button class="watch-btn">+ Watch</button>
+          <button class="watch-btn">+ Watchlist</button>
           <button class="like-btn">♥</button>
         </div>
       </div>
     `;
 
     div.querySelector(".watch-btn").onclick = () => addToWatchlist(movie);
-    div.querySelector(".like-btn").onclick = () => alert("Liked " + movie.Title);
+    div.querySelector(".like-btn").onclick = (e) => {
+      e.target.style.color = "#e50914"; 
+    };
+    
     container.appendChild(div);
   });
 }
 
-// FIXED: Added displayMovies call inside loadCategory
+// --- CATEGORY LOADING ---
 async function loadCategory(query, containerId) {
   var res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
   var data = await res.json();
   if (data.Response === "True") {
-    // Milestone Requirement: .sort() - Sorting by Year Descending
-    let sortedData = data.Search.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
-    displayMovies(sortedData, containerId);
+    displayMovies(data.Search, containerId);
   }
 }
 
@@ -94,8 +137,10 @@ async function setHeroMovie() {
   var data = await res.json();
   if (data.Response === "True") {
     var randomMovie = data.Search[Math.floor(Math.random() * data.Search.length)];
-    document.getElementById("heroPoster").src = randomMovie.Poster;
-    document.getElementById("heroTitle").innerText = randomMovie.Title;
+    var heroPoster = document.getElementById("heroPoster");
+    var heroTitle = document.getElementById("heroTitle");
+    if(heroPoster) heroPoster.src = randomMovie.Poster;
+    if(heroTitle) heroTitle.innerText = randomMovie.Title;
   }
 }
 
@@ -110,41 +155,25 @@ function addToWatchlist(movie) {
   }
 }
 
-// FIXED: Simplified Toggle Logic
 function toggleMode() {
   var body = document.body;
   var toggle = document.querySelector(".toggle");
-  
-  if (body.classList.contains("dark")) {
-    body.classList.replace("dark", "light");
-    toggle.classList.remove("active");
-  } else {
-    body.classList.replace("light", "dark");
-    toggle.classList.add("active");
-  }
+  body.classList.toggle("dark");
+  body.classList.toggle("light");
+  if(toggle) toggle.classList.toggle("active");
 }
 
-// Initialize
-var params = new URLSearchParams(window.location.search);
-var queryValue = params.get("q");
-if (queryValue) searchMovies(queryValue);
+// --- INITIALIZE ---
+window.onload = () => {
+  var params = new URLSearchParams(window.location.search);
+  var queryValue = params.get("q");
+  if (queryValue) searchMovies(queryValue);
 
-if (document.getElementById("heroTitle")) {
-  setHeroMovie();
-  loadCategory("comedy", "comedy");
-  loadCategory("romance", "romance");
-  loadCategory("sci-fi", "scifi");
-  loadCategory("action", "action");
-}
-// Function to sort results dynamically using .sort()
-function sortMovies(criteria, moviesArray) {
-  let sorted;
-  if (criteria === "year-desc") {
-    sorted = [...moviesArray].sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
-  } else if (criteria === "year-asc") {
-    sorted = [...moviesArray].sort((a, b) => parseInt(a.Year) - parseInt(b.Year));
-  } else if (criteria === "title") {
-    sorted = [...moviesArray].sort((a, b) => a.Title.localeCompare(b.Title));
+  if (document.getElementById("heroTitle")) {
+    setHeroMovie();
+    loadCategory("comedy", "comedy");
+    loadCategory("romance", "romance");
+    loadCategory("sci-fi", "scifi");
+    loadCategory("action", "action");
   }
-  displayMovies(sorted, "movies");
-}
+};
