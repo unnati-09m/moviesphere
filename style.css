@@ -20,7 +20,7 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 40px;
+  padding: 0px 40px;
   background: #111;
   color: white;
 }
@@ -35,7 +35,7 @@ nav {
   margin: 0 15px;
   color: white;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .nav-actions {
@@ -87,7 +87,7 @@ nav {
 .toggle.active .circle { left: 28px; }
 
 /* --- HERO SECTION --- */
-/* --- THE CLEAN HERO LAYOUT --- */
+
 .hero-clean {
   padding: 60px; /* Space around the whole section */
   display: flex;
@@ -105,7 +105,7 @@ nav {
 /* LEFT SIDE */
 .hero-left img {
   width: 320px; /* Fixed nice size for the poster */
-  border-radius: 12px;
+  /* border-radius: 12px; */
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
@@ -307,14 +307,14 @@ body.light .actions button { border-color: #ccc; color: #333; }
 
 /* no disapper */
 .hero {
-  min-height: 70vh;
+  min-height: 80vh;
   background: linear-gradient(to right, rgba(0,0,0,0.9), transparent);
   background-color: #111; /* Fallback */
 }
 
 #heroPoster {
-  max-width: 300px;
-  border-radius: 10px;
+  max-width: 600px;
+  /* border-radius: 10px; */
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   /* This ensures the image is visible */
   display: block; 
@@ -334,8 +334,8 @@ body.light .actions button { border-color: #ccc; color: #333; }
 }
 
 .hero-left img {
-  width: 300px; /* Fixed nice size */
-  border-radius: 8px;
+  width: 400px; 
+  /* border-radius: 8px; */
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
