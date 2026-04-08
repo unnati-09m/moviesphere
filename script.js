@@ -136,7 +136,7 @@ if (sortSelect) {
       var data = await res.json();
       if (data.Response === "True") {
         let movies = data.Search;
-        applySort(movies, criteria); // ✅ Apply HOF .sort()
+        applySort(movies, criteria); 
         displayMovies(movies, cat.id);
       }
     });

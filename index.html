@@ -37,28 +37,20 @@
  </nav>
 
  <!-- Hero section-->
-<section class="hero">
-
-
- <!-- LEFT -->
- <div class="hero-left">
-   <img id="heroPoster" src="" alt="movie">
- </div>
-
-
- <!-- RIGHT -->
- <div class="hero-right">
-   <h1 id="heroTitle">Movie Title</h1>
-   <p id="heroText">Explore movies and discover your next watch</p>
-
-
-   <div class="hero-buttons">
-     <button>▶ Play</button>
-     <button>+ Watchlist</button>
-   </div>
- </div>
-
-
+<section class="hero-clean">
+  <div class="hero-container">
+    <div class="hero-left">
+      <img id="heroPoster" src="" alt="movie poster">
+    </div>
+    <div class="hero-right">
+      <h1 id="heroTitle">Movie Title</h1>
+      <p id="heroText">Description appears here...</p>
+      <div class="hero-btns">
+        <button class="play-btn">▶ Play</button>
+        <button class="watchlist-btn" onclick="addToWatchlistFromHero()">+ Watchlist</button>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- Movies -->
