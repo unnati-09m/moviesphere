@@ -56,13 +56,21 @@
 <!-- Movies -->
  <section class="movies-section">
    <h2></h2>
-   <div style="padding: 0 60px;">
+
+  <div style="padding: 0 60px;">
   <label for="sortSelect">Sort By: </label>
   <select id="sortSelect" style="padding: 5px; border-radius: 4px;">
     <option value="default">Default</option>
     <option value="year-desc">Newest First</option>
     <option value="year-asc">Oldest First</option>
     <option value="alpha">Alphabetical (A-Z)</option>
+  </select>
+
+  <select id="genreFilter">
+    <option value="all">All Genres</option>
+    <option value="Action">Action</option>
+    <option value="Comedy">Comedy</option>
+    <option value="Drama">Drama</option>
   </select>
 </div>
 
@@ -87,12 +95,7 @@
   <h2>Action</h2>
   <div class="row" id="action"></div>
 </section>
-<select id="genreFilter" style="padding: 8px; margin-left: 10px;">
-    <option value="all">All Genres</option>
-    <option value="Action">Action</option>
-    <option value="Comedy">Comedy</option>
-    <option value="Drama">Drama</option>
-</select>
+
 
  <script src="script.js"></script>
 

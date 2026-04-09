@@ -357,3 +357,19 @@ body.light .actions button { border-color: #ccc; color: #333; }
 /* THEME LOGIC: No big black background anymore */
 body.light .hero-right h1 { color: #111; }
 body.dark .hero-right h1 { color: #fff; }
+
+#genreFilter {
+    padding: 8px 12px;
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+body.light #genreFilter {
+    background: #fff;
+    color: #333;
+    border-color: #ccc;
+}
