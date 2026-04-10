@@ -99,7 +99,7 @@ function displayMovies(movies, containerId) {
         <p>${movie.Year}</p>
         <div class="actions">
           <button class="watch-btn" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>+ Watchlist</button>
-          <button class="like-btn" onclick="this.style.color='#e50914'">♥</button>
+          <button class="like-btn" onclick='addToFavorites(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>❤️</button>
         </div>
       </div>
     `;
@@ -166,6 +166,7 @@ function displayWatchlist() {
     if (!container) return;
     const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
     container.innerHTML = watchlist.length ? "" : "<h3>Your watchlist is empty.</h3>";
+    
 
     watchlist.forEach(movie => {
         const div = document.createElement("div");
@@ -190,11 +191,13 @@ function removeFromWatchlist(id) {
 
 // --- THEME & INIT ---
 function toggleMode() {
-  document.body.classList.toggle("dark");
-  document.body.classList.toggle("light");
-  document.querySelector(".toggle").classList.toggle("active");
+  const body = document.body;
+  const toggleCircle = document.querySelector(".toggle");
+  
+  body.classList.toggle("dark");
+  body.classList.toggle("light");
+  toggleCircle.classList.toggle("active");
 }
-
 window.onload = () => {
   var params = new URLSearchParams(window.location.search);
   var q = params.get("q");
@@ -209,3 +212,42 @@ window.onload = () => {
   }
   displayWatchlist();
 };
+
+// fav logic
+function addToFavorites(movie) {
+  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  if (favorites.some(m => m.imdbID === movie.imdbID)) {
+    alert("Already in Favorites!");
+  } else {
+    favorites.push(movie);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    alert("Added to Favorites!");
+  }
+}
+
+function displayFavorites() {
+    const container = document.getElementById("favoritesContainer");
+    if (!container) return;
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    container.innerHTML = favorites.length ? "" : "<h3>Your favorites list is empty.</h3>";
+
+    favorites.forEach(movie => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+            <img src="${movie.Poster}">
+            <div class="card-info">
+                <h3>${movie.Title}</h3>
+                <button class="remove-btn" onclick="removeFromFavorites('${movie.imdbID}')">Remove</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function removeFromFavorites(id) {
+    let list = JSON.parse(localStorage.getItem("favorites")) || [];
+    list = list.filter(m => m.imdbID !== id);
+    localStorage.setItem("favorites", JSON.stringify(list));
+    displayFavorites();
+}

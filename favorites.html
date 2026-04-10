@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Favorites - MovieSphere</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+    <nav>
+        <h2 class="logo">MovieSphere</h2>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="favorites.html">Favorites</a>
+            <a href="watchlist.html">Watchlist</a>
+        </div>
+    </nav>
+    <section class="category">
+        <h1 style="margin: 40px;">My Favorites ❤️</h1>
+        <div id="favoritesContainer" class="row" style="flex-wrap: wrap;"></div>
+    </section>
+    <script src="script.js"></script>
+    <script>
+        window.onload = () => { displayFavorites(); };
+    </script>
+</body>
+</html>
