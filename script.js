@@ -99,7 +99,7 @@ function displayMovies(movies, containerId) {
         <p>${movie.Year}</p>
         <div class="actions">
           <button class="watch-btn" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>+ Watchlist</button>
-          <button class="like-btn" onclick='addToFavorites(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>❤️</button>
+          <button class="like-btn" onclick='addToFavorites(${JSON.stringify(movie).replace(/'/g, "&apos;")})'><i class="fa-solid fa-heart"></i></button>
         </div>
       </div>
     `;
