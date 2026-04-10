@@ -16,7 +16,7 @@
         }
     </style>
 </head>
-<body class="dark">
+<body >
     <nav>
         <h2 class="logo">MovieSphere</h2>
         <div class="nav-links">
@@ -27,18 +27,29 @@
         </div>
     </nav>
 
-    <section class="category">
-        <h1 style="margin-top: 40px; padding-left: 60px;">Explore All Movies</h1>
-        <div id="exploreGrid">
-            </div>
-    </section>
+<section class="category">
+    <h1 style="margin-top: 40px; padding-left: 60px;">Explore All Movies</h1>
+    
+    <div class="controls-container" style="padding-left: 60px; margin-bottom: 20px;">
+        <label for="sortSelect">Sort By: </label>
+        <select id="sortSelect" onchange="sortExploreMovies()">
+            <option value="default">Default</option>
+            <option value="year-desc">Newest First</option>
+            <option value="year-asc">Oldest First</option>
+            <option value="alpha">A-Z</option>
+        </select>
+    </div>
+
+    <div id="exploreGrid"></div>
+</section>
+    
 
     <script src="script.js"></script>
-    <script>
+    <!-- <script>
     window.onload = () => {
         // "man" is a great keyword because almost every movie has it in the title or metadata
         loadAllAvailableMovies("man", "exploreGrid"); 
     };
-</script>
+</script> -->
 </body>
 </html>
