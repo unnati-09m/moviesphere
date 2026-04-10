@@ -441,3 +441,12 @@ body.light #genreFilter {
     height: 380px; /* Nice tall cinematic look */
     object-fit: cover;
 }
+
+#navSearch {
+  display: inline-block; /* Change from none to inline-block */
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #222;
+  color: white;
+}

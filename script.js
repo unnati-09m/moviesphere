@@ -1,11 +1,10 @@
 let exploreMoviesList = []; 
 
-
+// toggle 
 function toggleMode() {
   var body = document.body;
   var toggleCircle = document.querySelector(".toggle");
   
-  // Switch between light and dark classes
   if (body.classList.contains("dark")) {
     body.classList.remove("dark");
     body.classList.add("light");
@@ -18,7 +17,6 @@ function toggleMode() {
     if (toggleCircle) toggleCircle.classList.add("active");
   }
 }
-
 
 function applySavedTheme() {
   var savedTheme = localStorage.getItem("theme") || "dark";
@@ -34,15 +32,13 @@ function applySavedTheme() {
   }
 }
 
-
-// fetch and dispayy
+// Movie Display Logic
 function displayMovies(movies, containerId) {
   var container = document.getElementById(containerId);
   if (!container) return;
-  container.innerHTML = ""; // Clear old content
+  container.innerHTML = ""; 
 
   movies.forEach(function(movie) {
-    //  (N/A)'s condition
     if (movie.Poster === "N/A" || !movie.Poster) return;
 
     var div = document.createElement("div");
@@ -62,7 +58,7 @@ function displayMovies(movies, containerId) {
   });
 }
 
-
+// Fetch Categories
 async function loadCategory(query, containerId) {
   var res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
   var data = await res.json();
@@ -71,31 +67,46 @@ async function loadCategory(query, containerId) {
   }
 }
 
-// project show ho raha hai 
+// SEARCH LOGIC
+function initiateSearch() {
+    const query = document.getElementById("navSearch").value;
+    if (query) {
+        // Redirects to search.html with the query in the URL
+        window.location.href = `search.html?query=${encodeURIComponent(query)}`;
+    }
+}
+
+async function loadSearchResults() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('query');
+    
+    // Uses the "movies" div in search.html
+    if (query && document.getElementById("movies")) {
+        loadCategory(query, "movies");
+    }
+}
+
+// Explore All Movies Logic
 async function loadAllAvailableMovies(query, containerId) {
   var container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = "<h3>Loading Movies...</h3>";
 
   let allResults = [];
-  
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 5; i++) {
     var res = await fetch(`https://www.omdbapi.com/?s=${query}&page=${i}&apikey=5844ec07`);
     var data = await res.json();
     if (data.Response === "True") {
       allResults = allResults.concat(data.Search);
     }
   }
-
-  
   exploreMoviesList = allResults.filter(m => m.Poster !== "N/A");
   displayMovies(exploreMoviesList, containerId);
 }
 
-// sort 
 function sortExploreMovies() {
   var sortValue = document.getElementById("sortSelect").value;
-  var sortedList = [...exploreMoviesList]; // Make a copy to sort
+  var sortedList = [...exploreMoviesList];
 
   if (sortValue === "year-desc") {
     sortedList.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
@@ -104,11 +115,10 @@ function sortExploreMovies() {
   } else if (sortValue === "alpha") {
     sortedList.sort((a, b) => a.Title.localeCompare(b.Title));
   }
-
   displayMovies(sortedList, "exploreGrid");
 }
 
-// watchlist and fav store 
+// Watchlist & Favorites Logic
 function addToWatchlist(movie) {
   var list = JSON.parse(localStorage.getItem("watchlist")) || [];
   if (!list.find(m => m.imdbID === movie.imdbID)) {
@@ -146,6 +156,22 @@ function displayWatchlist() {
   });
 }
 
+function removeFromWatchlist(id) {
+  var list = JSON.parse(localStorage.getItem("watchlist")) || [];
+  var newList = list.filter(m => m.imdbID !== id);
+  localStorage.setItem("watchlist", JSON.stringify(newList));
+  displayWatchlist();
+}
+
+function addToFavorites(movie) {
+  var list = JSON.parse(localStorage.getItem("favorites")) || [];
+  if (!list.find(m => m.imdbID === movie.imdbID)) {
+    list.push(movie);
+    localStorage.setItem("favorites", JSON.stringify(list));
+    alert("Added to Favorites!");
+  }
+}
+
 function displayFavorites() {
   var list = JSON.parse(localStorage.getItem("favorites")) || [];
   var container = document.getElementById("favoritesContainer");
@@ -174,25 +200,6 @@ function displayFavorites() {
   });
 }
 
-function removeFromWatchlist(id) {
-  var list = JSON.parse(localStorage.getItem("watchlist")) || [];
-  var newList = list.filter(m => m.imdbID !== id);
-  localStorage.setItem("watchlist", JSON.stringify(newList));
-  displayWatchlist();
-}
-
-
-function addToFavorites(movie) {
-  var list = JSON.parse(localStorage.getItem("favorites")) || [];
-  if (!list.find(m => m.imdbID === movie.imdbID)) {
-    list.push(movie);
-    localStorage.setItem("favorites", JSON.stringify(list));
-    alert("Added to Favorites!");
-  }
-}
-
-
-
 function removeFromFavorites(id) {
   var list = JSON.parse(localStorage.getItem("favorites")) || [];
   var newList = list.filter(m => m.imdbID !== id);
@@ -200,7 +207,6 @@ function removeFromFavorites(id) {
   displayFavorites();
 }
 
-// hero section 
 async function setHeroMovie() {
   var res = await fetch(`https://www.omdbapi.com/?t=Interstellar&apikey=5844ec07`);
   var movie = await res.json();
@@ -211,29 +217,41 @@ async function setHeroMovie() {
   }
 }
 
-
+// Master Initialization
 window.onload = function() {
   applySavedTheme();
 
-  // Home 
+  // Home Page
   if (document.getElementById("heroTitle")) {
     setHeroMovie();
     loadCategory("comedy", "comedy");
     loadCategory("star", "scifi");
     loadCategory("action", "action");
+    loadCategory("romance", "romance"); 
+
+    // Connect search button
+    const searchBtn = document.getElementById("searchBtn");
+    if (searchBtn) {
+        searchBtn.onclick = initiateSearch;
+    }
   }
 
-  //Movies Page 
+  // Search Results Page
+  if (window.location.pathname.includes("search.html")) {
+    loadSearchResults();
+  }
+
+  // Movies Page 
   if (document.getElementById("exploreGrid")) {
     loadAllAvailableMovies("movie", "exploreGrid");
   }
 
-  //  Watchlist 
+  // Watchlist Page
   if (document.getElementById("watchlistContainer")) {
     displayWatchlist();
   }
 
-  //  Favorites 
+  // Favorites Page
   if (document.getElementById("favoritesContainer")) {
     displayFavorites();
   }
