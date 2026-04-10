@@ -373,3 +373,29 @@ body.light #genreFilter {
     color: #333;
     border-color: #ccc;
 }
+/* Update .category to add spacing between titles and rows */
+.category {
+  padding: 40px 60px; /* Increased top padding for better spacing */
+}
+
+.category h2 {
+  margin-bottom: 20px; /* Adds space between the title and the movie cards */
+  font-size: 24px;
+}
+
+/* Fix Sort/Filter UI placement */
+.controls-container {
+    display: flex;
+    justify-content: flex-start; /* Aligns them to the left to match the titles */
+    padding: 20px 60px;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Update Sort/Genre dropdown styles */
+#sortSelect, #genreFilter {
+    margin: 0; /* Remove the old margins */
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
