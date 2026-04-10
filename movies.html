@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Explore Movies - MovieSphere</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Custom styles for bigger cards on this page */
+        #exploreGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Bigger cards */
+            gap: 30px;
+            padding: 40px 60px;
+        }
+        #exploreGrid .card img {
+            height: 180px; /* Taller images for the bigger cards */
+        }
+    </style>
+</head>
+<body class="dark">
+    <nav>
+        <h2 class="logo">MovieSphere</h2>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="movies.html">Movies</a>
+            <a href="favorites.html">Favorites</a>
+            <a href="watchlist.html">Watchlist</a>
+        </div>
+    </nav>
+
+    <section class="category">
+        <h1 style="margin-top: 40px; padding-left: 60px;">Explore All Movies</h1>
+        <div id="exploreGrid">
+            </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+    window.onload = () => {
+        // "man" is a great keyword because almost every movie has it in the title or metadata
+        loadAllAvailableMovies("man", "exploreGrid"); 
+    };
+</script>
+</body>
+</html>

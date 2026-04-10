@@ -17,7 +17,7 @@
 
    <div class="nav-links">
      <a href="#">Home</a>
-     <a href="#">Movies</a>
+     <a href="movies.html">Movies</a>
      <a href="favorites.html">Favorites</a>
      <a href="watchlist.html">Watchlist</a>
    </div>
@@ -54,36 +54,34 @@
 </section>
 
 <!-- Movies -->
- <section class="movies-section">
-   <h2></h2>
+<section class="movies-section">
+  <div class="controls-container">
+    <div class="sort-group">
+      <label for="sortSelect">Sort By: </label>
+      <select id="sortSelect">
+        <option value="default">Default</option>
+        <option value="year-desc">Newest First</option>
+        <option value="year-asc">Oldest First</option>
+        <option value="alpha">Alphabetical (A-Z)</option>
+      </select>
+    </div>
 
-  <div style="padding: 0 60px;">
-  <label for="sortSelect">Sort By: </label>
-  <select id="sortSelect" style="padding: 5px; border-radius: 4px;">
-    <option value="default">Default</option>
-    <option value="year-desc">Newest First</option>
-    <option value="year-asc">Oldest First</option>
-    <option value="alpha">Alphabetical (A-Z)</option>
-  </select>
+    <div class="filter-group">
+      <label for="genreFilter">Genre: </label>
+      <select id="genreFilter">
+        <option value="all">All Genres</option>
+        <option value="Action">Action</option>
+        <option value="Comedy">Comedy</option>
+        <option value="Drama">Drama</option>
+      </select>
+    </div>
+  </div>
 
-  <select id="genreFilter">
-    <option value="all">All Genres</option>
-    <option value="Action">Action</option>
-    <option value="Comedy">Comedy</option>
-    <option value="Drama">Drama</option>
-  </select>
-</div>
-
-   <div id="movies"></div>
- </section>
+  <div id="movies"></div>
+</section>
 <section class="category">
   <h2>Comedy</h2>
   <div class="row" id="comedy"></div>
-</section>
-
-<section class="category">
-  <h2>Romance</h2>
-  <div class="row" id="romance"></div>
 </section>
 
 <section class="category">
@@ -94,6 +92,11 @@
 <section class="category">
   <h2>Action</h2>
   <div class="row" id="action"></div>
+</section>
+
+<section class="category">
+  <h2>Romance</h2>
+  <div class="row" id="romance"></div>
 </section>
 
 

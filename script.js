@@ -41,7 +41,10 @@ async function setHeroMovie() {
       // SECOND FETCH: Get movie details (Plot/Description)
       const detailRes = await fetch(`https://www.omdbapi.com/?i=${randomMovie.imdbID}&apikey=5844ec07`);
       const details = await detailRes.json();
-      if (heroText) heroText.innerText = details.Plot;
+      if (heroText) {
+        // If plot is "N/A", show a default message instead
+        heroText.innerText = details.Plot !== "N/A" ? details.Plot : "Explore the latest details for this title below.";
+      }
     }
   } catch (err) {
     console.log("Hero Error:", err);
@@ -74,39 +77,43 @@ async function searchMovies(query) {
 }
 
 async function loadCategory(query, containerId) {
-  var res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=5844ec07`);
+  // Use more popular search terms to get more results
+  const searchQuery = query === "scifi" ? "star wars" : query; 
+  var res = await fetch(`https://www.omdbapi.com/?s=${searchQuery}&apikey=5844ec07`);
   var data = await res.json();
+  
   if (data.Response === "True") {
-    displayMovies(data.Search, containerId);
+    // Only pass the first 8 movies to keep the row clean
+    displayMovies(data.Search.slice(0, 8), containerId);
   }
 }
 
 // --- DISPLAY & SORTING ---
 function displayMovies(movies, containerId) {
-  var container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = "";
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
 
-  movies.forEach(function (movie) {
-    var div = document.createElement("div");
-    div.className = "card";
-    var poster = movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/200x300?text=No+Poster";
-    
-    div.innerHTML = `
-      <img src="${poster}">
-      <div class="card-info">
-        <h3>${movie.Title}</h3>
-        <p>${movie.Year}</p>
-        <div class="actions">
-          <button class="watch-btn" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>+ Watchlist</button>
-          <button class="like-btn" onclick='addToFavorites(${JSON.stringify(movie).replace(/'/g, "&apos;")})'><i class="fa-solid fa-heart"></i></button>
-        </div>
-      </div>
-    `;
-    container.appendChild(div);
-  });
+    movies.forEach(function (movie) {
+        // This is the most important part: Skip if no image
+        if (!movie.Poster || movie.Poster === "N/A") return;
+
+        var div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+            <img src="${movie.Poster}">
+            <div class="card-info">
+                <h3>${movie.Title}</h3>
+                <p>${movie.Year}</p>
+                <div class="actions">
+                    <button class="watch-btn" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>+ Watchlist</button>
+                    <button class="like-btn" onclick='addToFavorites(${JSON.stringify(movie).replace(/'/g, "&apos;")})'><i class="fa-solid fa-heart"></i></button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
 }
-
 // --- SORTING LOGIC ---
 const sortSelect = document.getElementById("sortSelect");
 
@@ -196,7 +203,13 @@ function toggleMode() {
   
   body.classList.toggle("dark");
   body.classList.toggle("light");
-  toggleCircle.classList.toggle("active");
+
+  // Sync the circle movement with the current mode
+  if (body.classList.contains("dark")) {
+    toggleCircle.classList.add("active");
+  } else {
+    toggleCircle.classList.remove("active");
+  }
 }
 window.onload = () => {
   var params = new URLSearchParams(window.location.search);
@@ -207,7 +220,7 @@ window.onload = () => {
     setHeroMovie();
     loadCategory("comedy", "comedy");
     loadCategory("romance", "romance");
-    loadCategory("sci-fi", "scifi");
+    loadCategory("scifi", "scifi");
     loadCategory("action", "action");
   }
   displayWatchlist();
@@ -250,4 +263,31 @@ function removeFromFavorites(id) {
     list = list.filter(m => m.imdbID !== id);
     localStorage.setItem("favorites", JSON.stringify(list));
     displayFavorites();
+}
+async function loadAllAvailableMovies(query, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = "<h3 style='padding: 20px;'>Loading please wait ...</h3>";
+
+    let allMovies = [];
+    
+    // We fetch 10 pages to get 100 total potential results
+    for (let i = 1; i <= 10; i++) {
+        try {
+            const res = await fetch(`https://www.omdbapi.com/?s=${query}&page=${i}&apikey=5844ec07`);
+            const data = await res.json();
+            
+            if (data.Response === "True") {
+                // Combine new movies with the list we already have
+                allMovies = allMovies.concat(data.Search);
+            }
+        } catch (error) {
+            console.log("Reached end of available pages.");
+            break; 
+        }
+    }
+
+    // Now send the giant list to be displayed
+    displayMovies(allMovies, containerId);
 }
