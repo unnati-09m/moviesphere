@@ -192,7 +192,7 @@ function displayFavorites() {
         <h3>${movie.Title}</h3>
         <div class="actions">
           <button class="watch-btn" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>+ Watchlist</button>
-          <button class="like-btn" onclick="removeFromFavorites('${movie.imdbID}')">💔</button>
+          <button class="like-btn" onclick="removeFromFavorites('${movie.imdbID}')"><i class="fas fa-heart-broken"></i></button>
         </div>
       </div>
     `;
@@ -208,22 +208,41 @@ function removeFromFavorites(id) {
 }
 
 async function setHeroMovie() {
-  var res = await fetch(`https://www.omdbapi.com/?t=Interstellar&apikey=5844ec07`);
-  var movie = await res.json();
-  if (movie.Response === "True") {
+
+  // Step 1: random keywords (VERY IMPORTANT)
+  const keywords = ["avengers", "batman", "love", "war", "space", "king", "life", "dark", "hero", "game"];
+
+  // Step 2: pick random keyword
+  const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+
+  // Step 3: search movies using that keyword
+  var res = await fetch(`https://www.omdbapi.com/?s=${randomKeyword}&apikey=5844ec07`);
+  var data = await res.json();
+
+  if (data.Response === "True") {
+
+    // Step 4: pick random movie from results
+    const randomMovie = data.Search[Math.floor(Math.random() * data.Search.length)];
+
+    // Step 5: fetch FULL details (for description)
+    var res2 = await fetch(`https://www.omdbapi.com/?i=${randomMovie.imdbID}&apikey=5844ec07`);
+    var movie = await res2.json();
+
+    // Step 6: display in hero
     document.getElementById("heroPoster").src = movie.Poster;
     document.getElementById("heroTitle").innerText = movie.Title;
     document.getElementById("heroText").innerText = movie.Plot;
   }
 }
 
-// Master Initialization
+
 window.onload = function() {
   applySavedTheme();
 
   // Home Page
   if (document.getElementById("heroTitle")) {
     setHeroMovie();
+    setInterval(setHeroMovie, 4000);
     loadCategory("comedy", "comedy");
     loadCategory("star", "scifi");
     loadCategory("action", "action");
@@ -236,7 +255,7 @@ window.onload = function() {
     }
   }
 
-  // Search Results Page
+  // Search
   if (window.location.pathname.includes("search.html")) {
     loadSearchResults();
   }
